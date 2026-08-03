@@ -1,35 +1,38 @@
-#Distributed-Banking-Platform
+Overview
+As the Lead Data Engineer for the Nigerian Retail Banking Intelligence Consortium (NRBIC), I designed and built a cloud-ready, event-driven data platform. The consortium brings together Tier 1 banks, Tier 2 banks, and digital-native financial institutions processing millions of daily transactions across mobile, POS terminals, ATMs, web, USSD, agents, and physical branches.
 
-## Case Study
+The Problem
+While each participating bank maintained its own operational systems, the consortium lacked a centralized platform capable of providing both real-time operational intelligence and historical insights.
 
-The **Nigerian Retail Banking Intelligence Consortium (NRBIC)** is a collaborative initiative involving Tier 1 banks, Tier 2 banks, and digital-native financial institutions. As digital banking adoption continues to grow, participating banks process millions of transactions daily across mobile banking, POS terminals, ATMs, web applications, USSD, agents, and physical branches.
+The existing reporting setup relied heavily on periodic batch exports, which caused major operational bottlenecks:
 
-Although each institution maintains its own operational systems, the consortium lacks a centralized analytics platform capable of providing both real-time operational intelligence and long-term analytical insights across participating banks. Existing reporting processes rely heavily on periodic batch exports, resulting in delayed fraud detection, limited operational visibility, and slow decision-making.
+Delayed Fraud Detection: Inability to flag suspicious patterns in real time across institutions.
 
-The consortium has commissioned a new **Distributed Banking Analytics Platform** capable of combining historical transaction data with continuously generated transaction events into a single analytics ecosystem.
+Limited Visibility: Disconnected views of transaction flows across different channels.
 
-As the Lead Data Engineer, your responsibility is to design and build a modern, event-driven data platform that demonstrates industry-standard engineering practices while remaining scalable, modular, and cloud-ready.
+Slow Decision-Making: Strategic decisions lagged behind live banking activity.
 
-The platform must support both historical and streaming workloads through separate but integrated processing paths. Historical datasets provide long-term analytical context, while simulated live transaction streams emulate real-world banking activity occurring across multiple financial institutions.
+To solve this, I was commissioned to build a Distributed Banking Analytics Platform capable of unifying historical transaction data with continuous live streams.
 
-Unlike traditional ETL pipelines, the solution should follow a distributed systems architecture where independent services communicate through events rather than direct dependencies. Every component should have a single responsibility, making the platform resilient, maintainable, and easy to extend.
+Key Architectural Decisions
+To make the platform resilient, modular, and scalable, I built it around three core engineering principles:
 
-Rather than storing data directly inside an analytics database, the platform should adopt a modern **Lakehouse architecture**, where immutable transaction events are first stored in an object storage layer before analytical models are built using SQL transformations.
+Dual Processing Paths (Batch + Streaming)
+I implemented separate but integrated processing paths. Historical datasets provide long-term analytical context, while simulated live transaction streams replicate real-world activity across all member institutions.
 
-The completed platform should provide a trusted data foundation capable of supporting fraud monitoring, operational reporting, customer analytics, channel performance monitoring, and strategic banking intelligence while demonstrating the engineering principles used in modern data platforms.## Case Study
+Decoupled Event-Driven Architecture
+Instead of traditional, tightly coupled ETL pipelines, I adopted a distributed systems approach. Independent services communicate asynchronously via events, ensuring each component has a single responsibility and the system remains highly fault-tolerant.
 
-The **Nigerian Retail Banking Intelligence Consortium (NRBIC)** is a collaborative initiative involving Tier 1 banks, Tier 2 banks, and digital-native financial institutions. As digital banking adoption continues to grow, participating banks process millions of transactions daily across mobile banking, POS terminals, ATMs, web applications, USSD, agents, and physical branches.
+Modern Lakehouse Pattern
+Rather than pushing data directly into a traditional analytics warehouse, I established a Lakehouse model. Immutable transaction events land first in an object storage layer before being curated and modeled through SQL transformations.
 
-Although each institution maintains its own operational systems, the consortium lacks a centralized analytics platform capable of providing both real-time operational intelligence and long-term analytical insights across participating banks. Existing reporting processes rely heavily on periodic batch exports, resulting in delayed fraud detection, limited operational visibility, and slow decision-making.
+Impact & Deliverables
+The completed platform serves as a trusted data foundation for the consortium, directly powering:
 
-The consortium has commissioned a new **Distributed Banking Analytics Platform** capable of combining historical transaction data with continuously generated transaction events into a single analytics ecosystem.
+Real-time fraud monitoring and threat mitigation.
 
-As the Lead Data Engineer, your responsibility is to design and build a modern, event-driven data platform that demonstrates industry-standard engineering practices while remaining scalable, modular, and cloud-ready.
+Live channel performance tracking across POS, ATM, USSD, and digital apps.
 
-The platform must support both historical and streaming workloads through separate but integrated processing paths. Historical datasets provide long-term analytical context, while simulated live transaction streams emulate real-world banking activity occurring across multiple financial institutions.
+Customer analytics and strategic banking intelligence.
 
-Unlike traditional ETL pipelines, the solution should follow a distributed systems architecture where independent services communicate through events rather than direct dependencies. Every component should have a single responsibility, making the platform resilient, maintainable, and easy to extend.
-
-Rather than storing data directly inside an analytics database, the platform should adopt a modern **Lakehouse architecture**, where immutable transaction events are first stored in an object storage layer before analytical models are built using SQL transformations.
-
-The completed platform should provide a trusted data foundation capable of supporting fraud monitoring, operational reporting, customer analytics, channel performance monitoring, and strategic banking intelligence while demonstrating the engineering principles used in modern data platforms.
+A scalable baseline for future distributed data services.
