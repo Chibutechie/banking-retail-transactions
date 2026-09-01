@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "historical-retail-payments-intelligence"
+version = "0.1.0"
+description = "A batch-driven historical retail payments analytics pipeline."
+readme = "Readme.md"
+requires-python = ">=3.11"
+dependencies = [
+  "duckdb",
+  "minio",
+  "pyarrow",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+retail-payments-pipeline = "retail_payments_pipeline.run_pipeline:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,1 +1,16 @@
 .env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated dbt artifacts
+dbt/target/
+dbt/logs/
+
+# Local MinIO persistence; preserve the directory placeholder only.
+/local-data/*
+!/local-data/.gitkeep
+!/local-data/minio/
+/local-data/minio/*
+!/local-data/minio/.gitkeep
