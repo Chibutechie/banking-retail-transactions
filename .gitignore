@@ -3,6 +3,7 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+docs\stack-checklist.md
 
 # Generated dbt artifacts
 dbt/target/
@@ -14,3 +15,4 @@ dbt/logs/
 !/local-data/minio/
 /local-data/minio/*
 !/local-data/minio/.gitkeep
+scratchpad
