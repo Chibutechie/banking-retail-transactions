@@ -1,0 +1,12 @@
+argon2-cffi==25.1.0
+argon2-cffi-bindings==26.1.0
+certifi==2026.7.22
+cffi==2.1.1
+duckdb==1.5.5
+minio==7.2.20
+pyarrow==25.0.1
+pycparser==3.0
+pycryptodome==3.23.0
+-e git+https://github.com/Chibutechie/banking-retail-transactions.git@19caaa13771b64024d34a1fc69d741ebc3e74560#egg=retail_transactions_intelligence
+typing_extensions==4.16.0
+urllib3==2.7.0

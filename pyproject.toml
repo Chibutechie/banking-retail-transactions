@@ -5,25 +5,16 @@ build-backend = "hatchling.build"
 [project]
 name = "retail-transactions-intelligence"
 version = "0.1.0"
-description = "A batch-driven historical banking retail transactions analytics pipeline."
-readme = "Readme.md"
+description = "Hugging Face to Snowflake ingestion pipeline prepared for dbt."
+readme = "README.md"
 requires-python = ">=3.11"
 
 dependencies = [
-  "duckdb",
-  "minio",
-  "pyarrow",
+    "pandas",
+    "pyarrow",
+    "requests",
+    "python-dotenv",
+    "snowflake-connector-python",
+    "snowflake-sqlalchemy",
+    "sqlalchemy",
 ]
-
-[project.optional-dependencies]
-dev = ["pytest"]
-
-[project.scripts]
-retail-transactions-pipeline = "retail_transactions_intelligence.run_pipeline:main"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/retail_transactions_intelligence"]
