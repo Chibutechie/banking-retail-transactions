@@ -4,6 +4,10 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 docs\stack-checklist.md
+credentials/
+docs/
+logs/
+
 
 # Generated dbt artifacts
 dbt/target/

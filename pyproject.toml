@@ -1,20 +1,79 @@
+Pyproject · TOML
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
+ 
 [project]
-name = "retail-transactions-intelligence"
+name = "nigerian-banking-analytics"
 version = "0.1.0"
-description = "Hugging Face to Snowflake ingestion pipeline prepared for dbt."
+description = "Historical Nigerian retail banking transactions pipeline — Hugging Face to BigQuery via DuckDB validation and dbt transformation."
 readme = "README.md"
 requires-python = ">=3.11"
-
+ 
 dependencies = [
-    "pandas",
-    "pyarrow",
-    "requests",
-    "python-dotenv",
-    "snowflake-connector-python",
-    "snowflake-sqlalchemy",
-    "sqlalchemy",
+    "datasets",                        
+    "pyarrow",                         
+    "duckdb",                          
+    "google-cloud-bigquery",          
+    "google-cloud-bigquery-storage",   
+    "dbt-core",                        
+    "dbt-bigquery",
+    "python-dotenv",                  
+    "loguru",                          
+    "typer",                         
 ]
+ 
+[project.optional-dependencies]
+dev = [
+    "pytest",                          
+    "pytest-cov",                      
+    "ruff",                            
+    "mypy",                            
+]
+ 
+[project.scripts]
+pipeline = "pipeline.run:app"
+ 
+[tool.ruff]
+line-length   = 88
+target-version = "py311"
+ 
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes (unused imports, undefined names)
+    "I",   # isort (import ordering)
+    "UP",  # pyupgrade (modernise Python syntax)
+    "B",   # flake8-bugbear (likely bugs and design issues)
+]
+ignore = [
+    "E501",  # line too long — handled by formatter, not linter
+]
+ 
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+ 
+[tool.mypy]
+python_version         = "3.11"
+strict                 = false
+ignore_missing_imports = true        
+warn_unused_ignores    = true
+warn_return_any        = true
+ 
+[tool.pytest.ini_options]
+testpaths    = ["tests"]
+addopts      = "-v --tb=short"       
+filterwarnings = [
+    "ignore::DeprecationWarning",    
+]
+ 
+[tool.coverage.run]
+source   = ["pipeline"]
+omit     = ["tests/*"]
+ 
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under   = 70                  
+ 
