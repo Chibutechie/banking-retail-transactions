@@ -20,3 +20,30 @@ dbt/logs/
 /local-data/minio/*
 !/local-data/minio/.gitkeep
 scratchpad
+
+# Runtime
+data/
+.env
+*.log
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/packages/
+
+# IDE
+.vscode/
+.idea/
+*.swp

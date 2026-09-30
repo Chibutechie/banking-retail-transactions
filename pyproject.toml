@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 
 [project]
-name = "nigerian-banking-analytics"
+name = "banking_platform"
 version = "0.1.0"
 description = "Historical Nigerian retail banking transactions pipeline — Hugging Face to BigQuery via DuckDB validation and dbt transformation."
 readme = "README.md"
