@@ -14,6 +14,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "data"
 
 BRONZE_PATH = DATA_DIR / "bronze" / "transactions.parquet"
+CLEAN_STAGING_PATH = DATA_DIR / "staging" / "clean_transactions.parquet"
 DEAD_LETTER_DIR = DATA_DIR / "dead-letter"
 LOG_DIR = DATA_DIR / "logs"
 
@@ -22,6 +23,7 @@ def ensure_dirs() -> None:
     """Create required directories on pipeline startup."""
     for directory in (
         BRONZE_PATH.parent,
+        CLEAN_STAGING_PATH.parent,
         DEAD_LETTER_DIR,
         LOG_DIR,
     ):
@@ -41,28 +43,28 @@ BQ_TABLE = f"{GCP_PROJECT_ID}.{BQ_DATASET_RAW}.transactions"
 
 # ── Validation Rules ──────────────────────────────────────────────────────────
 
-VALID_DATE_RANGE = (
-    date(2023, 1, 1),
-    date(2024, 12, 31),
-)
+VALID_DATE_MIN = date(2023, 1, 1)
+VALID_DATE_MAX = date(2024, 12, 31)
 
-REQUIRED_COLS = frozenset({
+REQUIRED_COLUMNS = frozenset({
     "transaction_id",
+    "account_id",
     "customer_id",
-    "bank_name",
-    "bank_tier",
+    "timestamp",
+    "amount_ngn",
+    "balance_before_ngn",
+    "balance_after_ngn",
+    "transaction_type",
     "channel",
-    "amount",
-    "balance_before",
-    "balance_after",
-    "transaction_date",
-    "state",
+    "merchant_category_code",
     "merchant_name",
-    "merchant_category",
-    "is_fraud",
-    "transaction_status",
-    "device_type",
+    "location_lga",
+    "location_state",
+    "device_id",
+    "status",
+    "fraud_flag",
 })
+
 
 ALLOWED_CHANNELS = frozenset({
     "mobile",
@@ -143,4 +145,5 @@ if __name__ == "__main__":
     print("Configuration validated successfully.")
     print(f"Project root: {ROOT_DIR}")
     print(f"Bronze path: {BRONZE_PATH}")
+    print(f"Clean staging path: {CLEAN_STAGING_PATH}")
     print(f"BigQuery table: {BQ_TABLE}")
