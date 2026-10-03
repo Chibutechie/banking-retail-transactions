@@ -29,9 +29,7 @@ def validate() -> dict:
 
     with duckdb.connect() as con:
 
-        # ------------------------------------------------------------------
         # DuckDB configuration
-        # ------------------------------------------------------------------
 
         con.execute("SET threads = 8")
 
@@ -39,9 +37,7 @@ def validate() -> dict:
             "DuckDB configured to use 8 threads."
         )
 
-        # ------------------------------------------------------------------
-        # 1. Read Bronze data
-        # ------------------------------------------------------------------
+                 #  READ BRONZE DATA 
 
         logger.info("Reading Bronze data...")
 
@@ -61,9 +57,7 @@ def validate() -> dict:
             f"Total rows: {total:,}"
         )
 
-        # ------------------------------------------------------------------
-        # 2. Validate schema
-        # ------------------------------------------------------------------
+                    # Validate schema
 
         logger.info("Checking Bronze schema...")
 
@@ -102,10 +96,9 @@ def validate() -> dict:
 
         logger.info("Schema validation passed.")
 
-        # ------------------------------------------------------------------
-        # 3. Apply business rules
-        # ------------------------------------------------------------------
-
+        
+                # Apply business rules
+        
         logger.info("Applying business rules...")
 
         business_rules_sql = f"""
@@ -248,9 +241,7 @@ def validate() -> dict:
             "Business-rule validation completed."
         )
 
-        # ------------------------------------------------------------------
-        # 4. Detect duplicate transaction IDs
-        # ------------------------------------------------------------------
+                 # Detect duplicate transaction IDs
 
         logger.info(
             "Checking for duplicate transaction IDs..."
@@ -291,9 +282,8 @@ def validate() -> dict:
             "Duplicate detection completed."
         )
 
-        # ------------------------------------------------------------------
-        # 5. Count clean and rejected records
-        # ------------------------------------------------------------------
+                #  Count clean and rejected records
+        
 
         logger.info(
             "Counting clean and rejected records..."
@@ -322,9 +312,8 @@ def validate() -> dict:
             f"Rejected: {rejected_count:,}"
         )
 
-        # ------------------------------------------------------------------
-        # 6. Write clean staging data
-        # ------------------------------------------------------------------
+        
+                # Write clean staging data
 
         logger.info(
             "Writing clean staging data..."
@@ -359,9 +348,9 @@ def validate() -> dict:
             f"{CLEAN_STAGING_PATH}"
         )
 
-        # ------------------------------------------------------------------
-        # 7. Write rejected records to dead-letter
-        # ------------------------------------------------------------------
+            
+                # Write rejected records to dead-letter
+        
 
         dead_letter_path = None
         dead_letter_csv_path = None
@@ -387,9 +376,9 @@ def validate() -> dict:
                 / "rejected.csv"
             )
 
-            # --------------------------------------------------------------
-            # Write rejected Parquet
-            # --------------------------------------------------------------
+                    
+                        #  Write rejected Parquet
+            
 
             rejected = con.execute(
                 """
@@ -412,9 +401,7 @@ def validate() -> dict:
                 f"{dead_letter_path}"
             )
 
-            # --------------------------------------------------------------
-            # Write rejected CSV
-            # --------------------------------------------------------------
+                     # Write rejected CSV
 
             con.execute(
                 f"""
@@ -445,18 +432,16 @@ def validate() -> dict:
                 "Dead-letter files not created."
             )
 
-    # ----------------------------------------------------------------------
-    # 8. Determine validation status
-    # ----------------------------------------------------------------------
+                
+                 # Determine validation status
 
     if rejected_count == 0:
         status = "passed"
     else:
         status = "completed_with_rejections"
 
-    # ----------------------------------------------------------------------
-    # 9. Return validation result
-    # ----------------------------------------------------------------------
+    
+                     #  Return validation result
 
     logger.info(
         "Validation completed successfully."
