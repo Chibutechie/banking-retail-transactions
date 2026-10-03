@@ -12,6 +12,7 @@ logs/
 # Generated dbt artifacts
 dbt/target/
 dbt/logs/
+dbt/packages 
 
 # Local MinIO persistence; preserve the directory placeholder only.
 /local-data/*
@@ -25,25 +26,3 @@ scratchpad
 data/
 .env
 *.log
-
-# Virtual environment
-.venv/
-env/
-venv/
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.egg-info/
-.pytest_cache/
-
-# dbt
-dbt/target/
-dbt/logs/
-dbt/packages/
-
-# IDE
-.vscode/
-.idea/
-*.swp
