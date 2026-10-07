@@ -17,6 +17,7 @@ BRONZE_PATH = DATA_DIR / "bronze" / "transactions.parquet"
 CLEAN_STAGING_PATH = DATA_DIR / "staging" / "clean_transactions.parquet"
 DEAD_LETTER_DIR = DATA_DIR / "dead-letter"
 LOG_DIR = DATA_DIR / "logs"
+MANIFESTS_DIR = DATA_DIR / "manifests"
 
 
 def ensure_dirs() -> None:
@@ -26,6 +27,7 @@ def ensure_dirs() -> None:
         CLEAN_STAGING_PATH.parent,
         DEAD_LETTER_DIR,
         LOG_DIR,
+        MANIFESTS_DIR,
     ):
         directory.mkdir(parents=True, exist_ok=True)
 
