@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: raw
+    database: banking-retail-transaction
+    schema: raw
+    description: "Raw banking transaction data loaded into BigQuery."
+
+    tables:
+      - name: transactions
+        description: "Raw retail banking transaction records."
+
+        columns:
+          - name: transaction_id
+            description: "Unique identifier for each transaction."
+            tests:
+              - not_null
+              - unique
+
+          - name: customer_id
+            description: "Identifier of the customer who made the transaction."
+            tests:
+              - not_null
+
+          - name: customer_name
+            description: "Full name of the customer."
