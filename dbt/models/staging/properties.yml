@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_transactions
+    description: "Cleaned and standardized banking transactions."
+
+    columns:
+      - name: transaction_id
+        description: "Unique identifier for each transaction."
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: "Identifier of the customer associated with the transaction."
+        data_tests:
+          - not_null
+
+      - name: amount_ngn
+        description: "Transaction amount in Nigerian Naira."
+        data_tests:
+          - not_null
