@@ -1,0 +1,248 @@
+version: 2
+
+models:
+  - name: dim_customer
+    columns:
+      - name: customer_key
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: total_amount_ngn
+        data_tests:
+          - not_null
+
+      - name: customer_segment
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["high_value", "mid_value", "low_value"]
+
+  - name: dim_date
+    columns:
+      - name: date_key
+        data_tests:
+          - unique
+          - not_null
+
+      - name: date
+        data_tests:
+          - unique
+          - not_null
+
+      - name: is_weekend
+        data_tests:
+          - not_null
+
+  - name: fct_transactions
+    columns:
+      - name: transaction_key
+        data_tests:
+          - unique
+          - not_null
+
+      - name: transaction_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref("dim_customer")
+                field: customer_key
+
+      - name: date_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref("dim_date")
+                field: date_key
+
+      - name: amount_ngn
+        data_tests:
+          - not_null
+
+      - name: is_fraud
+        data_tests:
+          - not_null
+
+  - name: fct_daily_summary
+    columns:
+      - name: date_key
+        data_tests:
+          - not_null
+
+      - name: channel
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  ["mobile", "pos", "atm", "web", "ussd", "agent", "branch"]
+
+      - name: transaction_type
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["credit", "debit"]
+
+      - name: status
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["success", "failed", "reversed", "pending"]
+
+      - name: transaction_count
+        data_tests:
+          - not_null
+
+      - name: fraud_count
+        data_tests:
+          - not_null
+
+  - name: fct_geographic_summary
+    description: "Geographic transaction and fraud trends by Nigerian state (36 states + FCT)."
+
+    columns:
+      - name: state
+        description: "Nigerian state or FCT."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: transaction_count
+        description: "Number of transactions in the state."
+        data_tests:
+          - not_null
+
+      - name: fraud_count
+        description: "Number of flagged fraudulent transactions in the state."
+        data_tests:
+          - not_null
+
+      - name: fraud_rate
+        description: "Share of transactions flagged as fraud in the state."
+        data_tests:
+          - not_null
+
+      - name: total_amount_ngn
+        description: "Total transaction value in the state (NGN)."
+        data_tests:
+          - not_null
+
+  - name: fct_channel_summary
+    description: "Channel adoption and performance metrics across Mobile, POS, ATM, Web, USSD, Agent, and Branch."
+
+    columns:
+      - name: channel
+        description: "Transaction channel."
+        data_tests:
+          - not_null
+          - unique
+          - accepted_values:
+              arguments:
+                values: ["mobile", "pos", "atm", "web", "ussd", "agent", "branch"]
+
+      - name: transaction_count
+        description: "Number of transactions on the channel."
+        data_tests:
+          - not_null
+
+      - name: fraud_count
+        description: "Number of flagged fraudulent transactions on the channel."
+        data_tests:
+          - not_null
+
+      - name: total_amount_ngn
+        description: "Total transaction value on the channel (NGN)."
+        data_tests:
+          - not_null
+
+  - name: fct_merchant_summary
+    description: "Transaction volumes and fraud exposure by merchant category code (MCC)."
+
+    columns:
+      - name: merchant_category_code
+        description: "Merchant category code."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: transaction_count
+        description: "Number of transactions in the category."
+        data_tests:
+          - not_null
+
+      - name: total_amount_ngn
+        description: "Total transaction value in the category (NGN)."
+        data_tests:
+          - not_null
+
+  - name: fct_fraud_summary
+    description: "Historical fraud pattern analysis across channels and states."
+
+    columns:
+      - name: channel
+        description: "Transaction channel."
+        data_tests:
+          - not_null
+
+      - name: state
+        description: "Nigerian state or FCT."
+        data_tests:
+          - not_null
+
+      - name: transaction_count
+        description: "Number of transactions in the channel/state combination."
+        data_tests:
+          - not_null
+
+      - name: fraud_count
+        description: "Number of flagged fraudulent transactions."
+        data_tests:
+          - not_null
+
+  - name: mart_executive_kpis
+    description: "Executive KPI summary: platform-wide headline metrics."
+
+    columns:
+      - name: total_transactions
+        description: "Total number of transactions."
+        data_tests:
+          - not_null
+
+      - name: total_fraud_transactions
+        description: "Total number of flagged fraudulent transactions."
+        data_tests:
+          - not_null
+
+      - name: overall_fraud_rate
+        description: "Overall fraud rate across all transactions."
+        data_tests:
+          - not_null
+
+      - name: total_transaction_value_ngn
+        description: "Total transaction value across all transactions (NGN)."
+        data_tests:
+          - not_null
+
+      - name: total_customers
+        description: "Total number of unique customers."
+        data_tests:
+          - not_null
+
+      - name: kpi_as_of_date
+        description: "Date the KPI snapshot is anchored to (latest transaction date)."
+        data_tests:
+          - not_null

@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: int_transactions_enriched
+    columns:
+      - name: transaction_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        data_tests:
+          - not_null
+
+      - name: transaction_timestamp
+        data_tests:
+          - not_null
+
+      - name: amount_ngn
+        data_tests:
+          - not_null
+
+      - name: channel_clean
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  ["mobile", "pos", "atm", "web", "ussd", "agent", "branch"]
+
+      - name: transaction_type_clean
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["credit", "debit"]
+
+      - name: status_clean
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["success", "failed", "reversed", "pending"]
+
+      - name: is_fraud
+        data_tests:
+          - not_null
+
+  - name: int_customer_metrics
+    columns:
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: total_transactions
+        data_tests:
+          - not_null
+
+      - name: total_amount_ngn
+        data_tests:
+          - not_null
+
+      - name: fraud_transaction_count
+        data_tests:
+          - not_null
+
+      - name: first_transaction_date
+        data_tests:
+          - not_null
+
+      - name: last_transaction_date
+        data_tests:
+          - not_null

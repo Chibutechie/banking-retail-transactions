@@ -1,0 +1,17 @@
+[sqlfluff]
+dialect = postgres
+templater = dbt
+runaway_limit = 10
+max_line_length = 120
+
+[sqlfluff:templater:dbt]
+project_dir = .
+profiles_dir = ~/.dbt
+profile = dbt
+target = dev
+
+[sqlfluff:indentation]
+tab_space_size = 4
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
