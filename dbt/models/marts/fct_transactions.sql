@@ -14,6 +14,7 @@ with
 select
     to_hex(md5(e.transaction_id)) as transaction_key,
     e.transaction_id,
+    e.customer_id,
     c.customer_key,
     d.date_key,
     e.account_id,

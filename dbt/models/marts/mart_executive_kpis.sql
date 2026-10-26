@@ -1,22 +1,14 @@
--- Executive KPI summary: platform-wide headline metrics for the Executive KPIs
--- Looker Studio dashboard. One row per run snapshot (the latest transaction
--- date is used as the "as of" anchor).
-
 with
 
-    base as (
-
-        select * from fct_transactions
-
-    ),
+    base as (select * from {{ ref("fct_transactions") }}),
 
     totals as (
 
         select
 
             count(*) as total_transactions,
-            count_if(is_fraud) as total_fraud_transactions,
-            safe_divide(count_if(is_fraud), count(*)) as overall_fraud_rate,
+            countif(is_fraud) as total_fraud_transactions,
+            safe_divide(countif(is_fraud), count(*)) as overall_fraud_rate,
             sum(amount_ngn) as total_transaction_value_ngn,
             avg(amount_ngn) as avg_transaction_value_ngn,
             count(distinct customer_id) as total_customers,
@@ -36,7 +28,7 @@ with
         select
             count(*) as latest_day_transactions,
             sum(amount_ngn) as latest_day_value_ngn,
-            count_if(is_fraud) as latest_day_fraud_count
+            countif(is_fraud) as latest_day_fraud_count
 
         from base
         where transaction_date = (select max(transaction_date) from base)

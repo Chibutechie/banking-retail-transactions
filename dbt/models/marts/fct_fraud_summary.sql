@@ -1,7 +1,3 @@
--- Historical fraud pattern analysis across channels and states.
--- One row per channel x state combination, highlighting fraud concentration.
--- Dashboard-ready for the Fraud Analysis Looker Studio dashboard.
-
 with
 
     fraud_patterns as (
@@ -10,17 +6,16 @@ with
             channel_clean as channel,
             location_state as state,
             count(*) as transaction_count,
-            count_if(is_fraud) as fraud_count,
-            safe_divide(count_if(is_fraud), count(*)) as fraud_rate,
+            countif(is_fraud) as fraud_count,
+            safe_divide(countif(is_fraud), count(*)) as fraud_rate,
             sum(if(is_fraud, amount_ngn, 0)) as fraud_amount_ngn,
             safe_divide(
-                sum(if(is_fraud, amount_ngn, 0)),
-                sum(amount_ngn)
+                sum(if(is_fraud, amount_ngn, 0)), sum(amount_ngn)
             ) as fraud_value_rate,
             min(transaction_date) as first_fraud_date,
             max(transaction_date) as last_fraud_date
 
-        from fct_transactions
+        from {{ ref("fct_transactions") }}
         group by channel_clean, location_state
 
     )
