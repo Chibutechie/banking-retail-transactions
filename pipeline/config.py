@@ -71,9 +71,10 @@ REQUIRED_COLUMNS = frozenset(
 )
 
 ALLOWED_CHANNELS = frozenset("mobile pos atm web ussd agent branch".split())
-ALLOWED_STATUSES = frozenset("success failed reversed".split())
+ALLOWED_STATUSES = frozenset("success failed reversed pending".split())
 
-# 36 states + FCT. Commas (not split) because several names contain spaces.
+# 36 states + FCT. Accept both canonical "fct" and common source variants
+# such as "Abuja (FCT)" and "abuja(fct)".
 NIGERIAN_STATES = frozenset(
     name.strip()
     for name in """

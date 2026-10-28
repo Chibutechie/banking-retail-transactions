@@ -4,10 +4,16 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, NoReturn
+
+if __package__ in (None, ""):
+    project_root = Path(__file__).resolve().parent.parent
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
 
 import typer
 

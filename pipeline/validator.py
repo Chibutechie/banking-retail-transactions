@@ -60,6 +60,27 @@ CLEAN_SELECT_SQL = """
 """
 
 
+def _normalize_location_state(value: object) -> str:
+    """Normalize state strings to the canonical allowlist values."""
+    if value is None:
+        return ""
+
+    text = str(value).strip().lower()
+    if not text:
+        return ""
+
+    text = text.replace("_", " ")
+    text = text.replace("(", " ").replace(")", " ")
+    text = text.replace("[", " ").replace("]", " ")
+    text = text.replace("-", " ")
+    text = " ".join(text.split())
+
+    if text in {"abuja fct", "abuja(fct)", "abuja (fct)", "fct"}:
+        return "fct"
+
+    return text
+
+
 def validate() -> dict:
     """Validate Bronze data and split it into clean and rejected records."""
 
@@ -72,6 +93,7 @@ def validate() -> dict:
     logger.info("Validating Bronze Parquet...")
 
     with duckdb.connect() as con:
+        con.create_function("normalize_state", _normalize_location_state)
         con.execute("SET threads = 8")
         logger.info("DuckDB configured to use 8 threads.")
 
@@ -174,7 +196,7 @@ def validate() -> dict:
                                      THEN 'invalid_timestamp' END,
 
                                 CASE WHEN location_state IS NULL
-                                      OR LOWER(TRIM(CAST(location_state AS VARCHAR)))
+                                      OR normalize_state(CAST(location_state AS VARCHAR))
                                          NOT IN ({_sql_set(NIGERIAN_STATES)})
                                      THEN 'invalid_state' END,
 
