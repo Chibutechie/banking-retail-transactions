@@ -3,9 +3,8 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
-docs\stack-checklist.md
 credentials/
-docs/
+docs/stack-checklist.md
 logs/
 
 
