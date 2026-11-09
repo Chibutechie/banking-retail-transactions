@@ -1,4 +1,3 @@
-.env
 .venv/
 __pycache__/
 *.py[cod]
@@ -6,6 +5,7 @@ __pycache__/
 credentials/
 docs/stack-checklist.md
 logs/
+
 
 
 # Generated dbt artifacts
@@ -23,5 +23,8 @@ scratchpad
 
 # Runtime
 data/
-.env
 *.log
+*.pbix
+*.pbiti
+config.bat
+node_modules
