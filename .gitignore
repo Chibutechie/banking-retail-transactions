@@ -8,6 +8,7 @@ docs/stack-checklist.md
 logs/
 
 
+
 # Generated dbt artifacts
 dbt/target/
 dbt/logs/
@@ -25,3 +26,5 @@ scratchpad
 data/
 .env
 *.log
+*.pbix
+*.pbiti

@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  - name: dim_channel
+    columns:
+      - name: channel_key
+        data_tests:
+          - unique
+          - not_null
+      - name: channel
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_geography
+    columns:
+      - name: geography_key
+        data_tests:
+          - unique
+          - not_null
+      - name: state
+        data_tests:
+          - not_null
+          - state_in_seed:
+              config:
+                severity: warn
+      - name: geopolitical_zone
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - north_central
+                  - north_east
+                  - north_west
+                  - south_east
+                  - south_south
+                  - south_west
+
+  - name: dim_customers
+    columns:
+      - name: customer_key
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+      - name: spend_quartile
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4]
+
+  - name: fct_transactions_keys
+    columns:
+      - name: transaction_id
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref("dim_customers")
+                field: customer_key
+      - name: channel_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref("dim_channel")
+                field: channel_key
+      - name: geography_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref("dim_geography")
+                field: geography_key
+      - name: date_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref("dim_date")
+                field: date_key
