@@ -4,19 +4,31 @@ with
 
     customer_dim as (
 
-        select customer_key, customer_id, customer_segment
+        select customer_id, customer_segment
         from {{ ref("dim_customer") }}
 
     ),
 
-    date_dim as (select date_key, date from {{ ref("dim_date") }})
+    transaction_keys as (
+
+        select
+            transaction_id,
+            customer_key,
+            channel_key,
+            geography_key,
+            date_key
+        from {{ ref("fct_transactions_keys") }}
+
+    )
 
 select
     to_hex(md5(e.transaction_id)) as transaction_key,
     e.transaction_id,
     e.customer_id,
-    c.customer_key,
-    d.date_key,
+    k.customer_key,
+    k.channel_key,
+    k.geography_key,
+    k.date_key,
     e.account_id,
     e.transaction_timestamp,
     e.transaction_date,
@@ -55,4 +67,4 @@ select
 
 from enriched e
 left join customer_dim c using (customer_id)
-left join date_dim d on d.date = e.transaction_date
+left join transaction_keys k using (transaction_id)

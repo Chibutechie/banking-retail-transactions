@@ -1,0 +1,41 @@
+state_alias,state,geopolitical_zone
+abia,abia,south_east
+adamawa,adamawa,north_east
+akwa ibom,akwa ibom,south_south
+anambra,anambra,south_east
+bauchi,bauchi,north_east
+bayelsa,bayelsa,south_south
+benue,benue,north_central
+borno,borno,north_east
+cross river,cross river,south_south
+delta,delta,south_south
+ebonyi,ebonyi,south_east
+edo,edo,south_south
+ekiti,ekiti,south_west
+enugu,enugu,south_east
+gombe,gombe,north_east
+imo,imo,south_east
+jigawa,jigawa,north_west
+kaduna,kaduna,north_west
+kano,kano,north_west
+katsina,katsina,north_west
+kebbi,kebbi,north_west
+kogi,kogi,north_central
+kwara,kwara,north_central
+lagos,lagos,south_west
+nassarawa,nasarawa,north_central
+nasarawa,nasarawa,north_central
+niger,niger,north_central
+ogun,ogun,south_west
+ondo,ondo,south_west
+osun,osun,south_west
+oyo,oyo,south_west
+plateau,plateau,north_central
+rivers,rivers,south_south
+sokoto,sokoto,north_west
+taraba,taraba,north_east
+yobe,yobe,north_east
+zamfara,zamfara,north_west
+fct,fct,north_central
+abuja,fct,north_central
+federal capital territory,fct,north_central
