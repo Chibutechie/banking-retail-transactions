@@ -29,26 +29,26 @@ with
     )
 
 select
-    channel,
-    transaction_count,
-    fraud_count,
-    fraud_rate,
-    total_amount_ngn,
-    avg_amount_ngn,
-    successful_amount_ngn,
-    successful_count,
-    failed_count,
-    reversed_count,
-    pending_count,
-    debit_count,
-    credit_count,
-    total_debit_amount_ngn,
-    total_credit_amount_ngn,
-    unique_customers,
-    unique_accounts,
-    first_transaction_date,
-    last_transaction_date,
-    row_number() over (order by transaction_count desc) as volume_rank,
-    row_number() over (order by fraud_rate desc) as fraud_rate_rank
+    c.channel,
+    c.transaction_count,
+    c.fraud_count,
+    c.fraud_rate,
+    c.total_amount_ngn,
+    c.avg_amount_ngn,
+    c.successful_amount_ngn,
+    c.successful_count,
+    c.failed_count,
+    c.reversed_count,
+    c.pending_count,
+    c.debit_count,
+    c.credit_count,
+    c.total_debit_amount_ngn,
+    c.total_credit_amount_ngn,
+    c.unique_customers,
+    c.unique_accounts,
+    c.first_transaction_date,
+    c.last_transaction_date,
+    row_number() over (order by c.transaction_count desc) as volume_rank,
+    row_number() over (order by c.fraud_rate desc) as fraud_rate_rank
 
-from channel
+from channel as c

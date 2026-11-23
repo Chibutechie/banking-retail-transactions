@@ -24,7 +24,7 @@ select
     g.geography_key,
     d.date_key
 from geography_matches t
-left join {{ ref("dim_customers") }} c using (customer_id)
+left join {{ ref("dim_customer") }} c using (customer_id)
 left join {{ ref("dim_channel") }} ch on ch.channel = t.channel_clean
 left join {{ ref("dim_geography") }} g
     on g.state = t.state and g.location_lga = t.location_lga

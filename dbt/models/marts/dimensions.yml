@@ -36,22 +36,6 @@ models:
                   - south_south
                   - south_west
 
-  - name: dim_customers
-    columns:
-      - name: customer_key
-        data_tests:
-          - unique
-          - not_null
-      - name: customer_id
-        data_tests:
-          - unique
-          - not_null
-      - name: spend_quartile
-        data_tests:
-          - accepted_values:
-              arguments:
-                values: [1, 2, 3, 4]
-
   - name: fct_transactions_keys
     columns:
       - name: transaction_id
@@ -63,7 +47,7 @@ models:
           - not_null
           - relationships:
               arguments:
-                to: ref("dim_customers")
+                to: ref("dim_customer")
                 field: customer_key
       - name: channel_key
         data_tests:
