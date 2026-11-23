@@ -4,7 +4,7 @@
     from {{ model }}
     where {{ column_name }} is not null
       and lower(trim({{ column_name }})) not in (
-          select distinct state
+          select distinct lower(trim(state))
           from {{ ref("state_zones") }}
       )
 
