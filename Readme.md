@@ -1,8 +1,74 @@
-# Historical Retail Payments Analytics
+# End-to-End Data Engineering of a Banking Retail Payments Analytics
+
+## Navigation
+
+---
+
+- [Overview](#overview)
+- [Project Objective](#project-objective)
+- [Pipeline Overview](#pipeline-overview)
+- [Project Structure](#project-structure)
+- [Architecture Flow](#architecture-flow)
+- [How It Works](#how-it-works)
+- [Source Dataset](#source-dataset)
+- [Technologies](#technologies)
+- [Setup Instructions](#setup-instructions)
+- [Dashboard](#dashboard)
+
+---
+
+## Overview
+
+---
+
+A reproducible, batch-driven analytics platform that turns a historical snapshot of about 5 million synthetic retail banking transactions into trusted, documented datasets in Google BigQuery, served through Looker Studio dashboards.
+
+> > Note: The source data is synthetic. It is built to resemble consortium payments data but contains no real customer or bank records.
+
+The platform supports analysis of fraud patterns, customer spending, channel performance, bank benchmarks, and geographic trends across 36 Nigerian states and the FCT. It covers Mobile, POS, ATM, Web, USSD, Agent, and Branch channels.
+
+The design follows one principle: validate locally and cheaply, then transform and serve in the cloud. DuckDB checks the raw file before anything reaches BigQuery, and dbt builds all transformation layers inside BigQuery.
 
 A batch analytics project for exploring channel, geographic, merchant-category, customer-segment, and fraud-label patterns in a historical Nigerian retail transaction dataset. The source dataset is synthetic; this project does not support cross-bank comparisons or claims about live banking activity.
 
 The pipeline downloads a Hugging Face Parquet dataset, validates it locally with DuckDB, loads accepted rows into BigQuery, and transforms it with dbt. The mart tables are available for Power BI through BigQuery's connector.
+
+[![Python](https://img.shields.io/badge/python-3.13-blue)](https://www.python.org/)
+[![dbt](https://img.shields.io/badge/dbt-1.11-orange)](https://www.getdbt.com/)
+[![duckdb](https://img.shields.io/badge/snowflake-latest-blue)](https://www.snowflake.com/)
+[![Power BI](https://img.shields.io/badge/power%20bi-ready-yellow)](https://powerbi.microsoft.com/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+---
+
+## The Business Problem
+
+> Each participating bank ran its own systems and periodic exports, so no one had a consolidated, trusted view of payment activity across the consortium.
+
+| Gap                    | What was missing                                                       | Impact                                                                |
+| ---------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| **Fraud analysis**     | A cross-institution view of historical fraud patterns                  | A pattern visible at one bank could go unnoticed by the others        |
+| **Channel visibility** | A connected view across Mobile, POS, ATM, Web, USSD, Agent, and Branch | Adoption and performance were hard to compare                         |
+| **Decision-making**    | A governed, reusable data foundation                                   | Each analysis was rebuilt from raw exports, so results could conflict |
+
+```mermaid
+flowchart LR
+    subgraph Problem
+        A[Separate bank systems<br/>and periodic exports] --> B[No consolidated view]
+        B --> C[Fraud patterns<br/>missed across banks]
+        B --> D[Channel performance<br/>hard to compare]
+        B --> E[Inconsistent<br/>reporting]
+    end
+
+    subgraph Solution
+        F[Historical transaction<br/>snapshot] --> G[Validated, documented<br/>BigQuery datasets]
+        G --> H[Fraud, customer, channel,<br/>geographic and benchmark insights]
+    end
+
+    Problem -.-> Solution
+```
+
+_The diagram renders on GitHub and in most Markdown viewers that support Mermaid. If it doesn't render where you publish, the table above works on its own._
 
 ## What the data shows
 
@@ -103,5 +169,14 @@ The dbt schema-name macro uses configured model schemas without adding the profi
 
 - [Source dataset](https://huggingface.co/datasets/electricsheepafrica/nigerian-banking-retail-transactions)
 - [Architecture](docs/architecture.md)
+- [dbt model reference](docs/dbt_models.md)
+- [Data dictionary and validation results](docs/data_dictionary.md)
+  ocs/architecture.md)
+- [dbt model reference](docs/dbt_models.md)
+- [Data dictionary and validation results](docs/data_dictionary.md)
+  ocs/architecture.md)
+- [dbt model reference](docs/dbt_models.md)
+- [Data dictionary and validation results](docs/data_dictionary.md)
+  ocs/architecture.md)
 - [dbt model reference](docs/dbt_models.md)
 - [Data dictionary and validation results](docs/data_dictionary.md)
