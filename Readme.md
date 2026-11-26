@@ -1,5 +1,7 @@
 # End-to-End Data Engineering of a Banking Retail Payments Analytics
 
+A batch data pipeline and analytics model for historical Nigerian retail banking transactions. Raw records are downloaded from Hugging Face, validated locally with DuckDB, loaded into Google BigQuery, transformed with dbt into a star schema, and reported in Power BI.
+
 ## Navigation
 
 ---
@@ -21,17 +23,17 @@
 
 ---
 
-A reproducible, batch-driven analytics platform that turns a historical snapshot of about 5 million synthetic retail banking transactions into trusted, documented datasets in Google BigQuery, served through Looker Studio dashboards.
+This project implements an end-to-end batch pipeline over 5,000,000 historical retail banking transactions. It covers ingestion, schema and business-rule validation, warehouse loading, dimensional modelling and reporting.
 
-> > Note: The source data is synthetic. It is built to resemble consortium payments data but contains no real customer or bank records.
+The pipeline is a single command, `pipeline`, that runs every stage in order and writes a JSON run manifest on each execution, whether it succeeds or fails. Rejected records are kept in a dead-letter file, so no row is silently dropped.
 
-The platform supports analysis of fraud patterns, customer spending, channel performance, bank benchmarks, and geographic trends across 36 Nigerian states and the FCT. It covers Mobile, POS, ATM, Web, USSD, Agent, and Branch channels.
+Key outcomes from the most recent full run:
 
-The design follows one principle: validate locally and cheaply, then transform and serve in the cloud. DuckDB checks the raw file before anything reaches BigQuery, and dbt builds all transformation layers inside BigQuery.
-
-A batch analytics project for exploring channel, geographic, merchant-category, customer-segment, and fraud-label patterns in a historical Nigerian retail transaction dataset. The source dataset is synthetic; this project does not support cross-bank comparisons or claims about live banking activity.
-
-The pipeline downloads a Hugging Face Parquet dataset, validates it locally with DuckDB, loads accepted rows into BigQuery, and transforms it with dbt. The mart tables are available for Power BI through BigQuery's connector.
+| Metric                      | Value                          |
+| --------------------------- | ------------------------------ |
+| Source rows                 | 5,000,000                      |
+| Rejected rows (dead-letter) | 578,704 (~11.6%)               |
+| Warehouse                   | `raw.transactions` in BigQuery |
 
 [![Python](https://img.shields.io/badge/python-3.13-blue)](https://www.python.org/)
 [![dbt](https://img.shields.io/badge/dbt-1.11-orange)](https://www.getdbt.com/)
@@ -68,8 +70,6 @@ flowchart LR
 
     Problem -.-> Solution
 ```
-
-_The diagram renders on GitHub and in most Markdown viewers that support Mermaid. If it doesn't render where you publish, the table above works on its own._
 
 ## What the data shows
 
