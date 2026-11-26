@@ -5,6 +5,7 @@
 ---
 
 - [Overview](#overview)
+- [The Business Problem](#the-business-problem)
 - [Project Objective](#project-objective)
 - [Pipeline Overview](#pipeline-overview)
 - [Project Structure](#project-structure)
@@ -35,10 +36,10 @@ The pipeline downloads a Hugging Face Parquet dataset, validates it locally with
 
 [![Python](https://img.shields.io/badge/python-3.13-blue)](https://www.python.org/)
 [![dbt](https://img.shields.io/badge/dbt-1.11-orange)](https://www.getdbt.com/)
-[![duckdb](https://img.shields.io/badge/snowflake-latest-blue)](https://www.snowflake.com/)
+[![DuckDB](https://img.shields.io/badge/DuckDB-local%20validation-yellow)](https://duckdb.org/)
+[![BigQuery](https://img.shields.io/badge/BigQuery-cloud%20warehouse-4285F4)](https://cloud.google.com/bigquery)
 [![Power BI](https://img.shields.io/badge/power%20bi-ready-yellow)](https://powerbi.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-a
 
 ---
 
