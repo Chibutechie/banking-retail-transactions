@@ -38,6 +38,7 @@ The pipeline downloads a Hugging Face Parquet dataset, validates it locally with
 [![duckdb](https://img.shields.io/badge/snowflake-latest-blue)](https://www.snowflake.com/)
 [![Power BI](https://img.shields.io/badge/power%20bi-ready-yellow)](https://powerbi.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+a
 
 ---
 
