@@ -17,20 +17,7 @@ This document explains the architecture of the Nigerian Retail Banking Intellige
 
 ## 1. System overview
 
-![Nigerian Retail Banking Intelligence Platform architecture](images/architecture.png)
-
-([SVG source](images/architecture.svg))
-
-```mermaid
-flowchart LR
-    HF[Hugging Face dataset] --> Bronze[Bronze Parquet<br/>immutable snapshot]
-    Bronze --> DuckDB[DuckDB validation]
-    DuckDB --> Clean[Clean staging Parquet]
-    DuckDB --> Rejects[Dead-letter Parquet and CSV]
-    Clean --> Raw[BigQuery raw.transactions]
-    Raw --> DBT[dbt staging, intermediate,<br/>marts and tests]
-    DBT --> Marts[BigQuery marts]
-```
+![Nigerian Retail Banking Intelligence Platform architecture](images/architecture.svg)
 
 The platform is a batch pipeline that turns one historical transaction snapshot into validated, documented analytical datasets in BigQuery. It runs on demand through a single command. The design follows one principle: **validate locally and cheaply, then transform and serve in the cloud.**
 
@@ -303,5 +290,3 @@ At that point, an orchestrator such as Apache Airflow fits the design without ch
 **Revisit partitioning and clustering when:** tables grow large enough that query cost or speed becomes a concern. Both are configured in dbt and do not change the architecture.
 
 ---
-
-_Last updated: [date]. Update this document when a decision in the log changes._
