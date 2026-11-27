@@ -28,3 +28,5 @@ node_modules
 
 .audit-cache/
 dbt/tmp*
+
+.env
