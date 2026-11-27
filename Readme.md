@@ -1,6 +1,6 @@
 # End-to-End Data Engineering of a Banking Retail Payments Analytics
 
-A batch data pipeline and analytics model for historical Nigerian retail banking transactions. Raw records are downloaded from Hugging Face, validated locally with DuckDB, loaded into Google BigQuery, transformed with dbt into a star schema, and reported in Power BI.
+A batch data pipeline and analytics model for historical Nigerian retail banking transactions. Raw records are downloaded from Hugging Face, validated locally with DuckDB, loaded into Google BigQuery, and transformed with dbt into a star schema.
 
 ## Navigation
 
@@ -16,7 +16,6 @@ A batch data pipeline and analytics model for historical Nigerian retail banking
 - [Source Dataset](#source-dataset)
 - [Technologies](#technologies)
 - [Setup Instructions](#setup-instructions)
-- [Dashboard](#dashboard)
 
 ---
 
@@ -24,7 +23,7 @@ A batch data pipeline and analytics model for historical Nigerian retail banking
 
 ---
 
-This project implements an end-to-end batch pipeline over 5,000,000 historical retail banking transactions. It covers ingestion, schema and business-rule validation, warehouse loading, dimensional modelling and reporting.
+This project implements an end-to-end batch pipeline over 5,000,000 historical retail banking transactions. It covers ingestion, schema and business-rule validation, warehouse loading, and dimensional modelling.
 
 The pipeline is a single command, `pipeline`, that runs every stage in order and writes a JSON run manifest on each execution, whether it succeeds or fails. Rejected records are kept in a dead-letter file, so no row is silently dropped.
 
@@ -40,7 +39,6 @@ Key outcomes from the most recent full run:
 [![dbt](https://img.shields.io/badge/dbt-1.11-orange)](https://www.getdbt.com/)
 [![DuckDB](https://img.shields.io/badge/DuckDB-local%20validation-yellow)](https://duckdb.org/)
 [![BigQuery](https://img.shields.io/badge/BigQuery-cloud%20warehouse-4285F4)](https://cloud.google.com/bigquery)
-[![Power BI](https://img.shields.io/badge/power%20bi-ready-yellow)](https://powerbi.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ---
@@ -61,7 +59,7 @@ flowchart LR
         A[Separate bank systems<br/>and periodic exports] --> B[No consolidated view]
         B --> C[Fraud patterns<br/>missed across banks]
         B --> D[Channel performance<br/>hard to compare]
-        B --> E[Inconsistent<br/>reporting]
+        B --> E[Inconsistent<br/>analysis]
     end
 
     subgraph Solution
@@ -89,6 +87,10 @@ The latest local validation accepted all 5,000,000 rows, with no rejected record
 
 ## Architecture
 
+![Nigerian Retail Banking Intelligence Platform architecture](docs/images/architecture.png)
+
+([SVG source](docs/images/architecture.svg))
+
 ```mermaid
 flowchart LR
     HF[Hugging Face dataset] --> Bronze[Bronze Parquet]
@@ -98,7 +100,6 @@ flowchart LR
     Clean --> Raw[BigQuery raw.transactions]
     Raw --> DBT[dbt models and tests]
     DBT --> Marts[BigQuery marts]
-    Marts --> PowerBI[Power BI]
 ```
 
 The Python CLI runs download, validation, BigQuery load, and `dbt build` in sequence. It writes a JSON manifest for success or failure. For implementation details, see [architecture](docs/architecture.md) and [dbt models](docs/dbt_models.md).
@@ -143,10 +144,6 @@ dbt test --project-dir dbt --profiles-dir dbt
 
 Configuration variables are listed in [.env.example](.env.example). `BQ_DATASET_RAW` defaults to `raw`, `BQ_LOCATION` to `US`, and `DATA_DIR` to `data`. The dbt profile reads `GCP_PROJECT_ID`, `BQ_DATASET_RAW`, and `BQ_LOCATION` from the environment.
 
-## Power BI
-
-In Power BI Desktop, choose **Get data → Google BigQuery**, authenticate with a Google account that can read the BigQuery datasets and run query jobs, then select project `GCP_PROJECT_ID` and dataset `marts`. The mart dataset contains `dim_customer`, `dim_date`, `fct_channel_summary`, `fct_daily_summary`, `fct_fraud_summary`, `fct_geographic_summary`, `fct_merchant_summary`, `fct_transactions`, and `mart_executive_kpis`. The `staging` and `intermediate` datasets expose the other dbt model relations.
-
 The dbt schema-name macro uses configured model schemas without adding the profile dataset prefix: outputs go to `staging`, `intermediate`, `marts`, and `snapshots`; the raw source remains in `raw`. The previous `raw_staging`, `raw_intermediate`, and `raw_marts` datasets were removed after confirming they contained only the old dbt relations.
 
 ## Project status and limitations
@@ -157,7 +154,6 @@ The dbt schema-name macro uses configured model schemas without adding the profi
 - `snapshot_customers` references `customer_name`, which is absent from the raw loader schema and staging model. The snapshot needs correction before it can be relied on.
 - A prior test run had 59 tests: 57 passed, the date-dimension test was subsequently fixed, and `assert_balance_consistency` returned 317,697 rows. The current project declares 90 tests; that full suite has not been rerun as a whole.
 - The latest `dbt run` successfully built all 12 models into the unprefixed datasets. This does not establish that the full `dbt build` (including snapshots and tests) is clean.
-- No Power BI screenshots or shared report URL are included yet.
 - The upstream dataset card lists Apache-2.0 for the dataset. This repository has no `LICENSE` file; the dataset license does not automatically license this project's code.
 
 ## Repository map

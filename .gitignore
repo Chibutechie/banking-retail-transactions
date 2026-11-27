@@ -23,7 +23,8 @@ scratchpad
 # Runtime
 data/
 *.log
-*.pbix
-*.pbit
 config.bat
 node_modules
+
+.audit-cache/
+dbt/tmp*
