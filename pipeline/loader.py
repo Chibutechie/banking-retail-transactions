@@ -8,9 +8,7 @@ from pipeline.config import (
     CLEAN_STAGING_PATH,
     GCP_PROJECT_ID,
 )
-
 from pipeline.logger import logger
-
 
 # Explicit schema matching the source dataset.
 # The raw BigQuery table preserves the validated source structure.
@@ -101,56 +99,38 @@ RAW_SCHEMA = [
 def load(expected_row_count: int) -> dict:
 
     # 1. Check clean staging file
-    
 
     if not CLEAN_STAGING_PATH.exists():
-        raise FileNotFoundError(
-            f"Clean staging not found: {CLEAN_STAGING_PATH}"
-        )
+        raise FileNotFoundError(f"Clean staging not found: {CLEAN_STAGING_PATH}")
 
-    logger.info(
-        f"Clean staging file found: {CLEAN_STAGING_PATH}"
-    )
+    logger.info(f"Clean staging file found: {CLEAN_STAGING_PATH}")
 
-    
     # 2. Get BigQuery destination
 
     bq_table = BQ_TABLE
 
-    logger.info(
-        f"Loading clean data to BigQuery: {bq_table}"
-    )
+    logger.info(f"Loading clean data to BigQuery: {bq_table}")
 
     # 3. Create BigQuery client
-    
 
-    client = bigquery.Client(
-        project=GCP_PROJECT_ID
-    )
+    client = bigquery.Client(project=GCP_PROJECT_ID)
 
     # 4. Configure BigQuery load job
 
     job_config = bigquery.LoadJobConfig(
         schema=RAW_SCHEMA,
         source_format=bigquery.SourceFormat.PARQUET,
-        write_disposition=(
-            bigquery.WriteDisposition.WRITE_TRUNCATE
-        ),
+        write_disposition=(bigquery.WriteDisposition.WRITE_TRUNCATE),
     )
 
-    
     # 5. Load Parquet into BigQuery
-    
 
-    logger.info(
-        "Starting BigQuery load job..."
-    )
+    logger.info("Starting BigQuery load job...")
 
     with open(
         CLEAN_STAGING_PATH,
         "rb",
     ) as file:
-
         job = client.load_table_from_file(
             file,
             bq_table,
@@ -158,22 +138,15 @@ def load(expected_row_count: int) -> dict:
             job_config=job_config,
         )
 
-    logger.info(
-        f"BigQuery load job started: {job.job_id}"
-    )
+    logger.info(f"BigQuery load job started: {job.job_id}")
 
     # 6. Wait for BigQuery job
-    
 
     try:
-
         job.result()
 
     except Exception as exc:
-
-        logger.error(
-            f"BigQuery load failed: {exc}"
-        )
+        logger.error(f"BigQuery load failed: {exc}")
 
         return {
             "status": "failed",
@@ -182,31 +155,21 @@ def load(expected_row_count: int) -> dict:
             "error": str(exc),
         }
 
-    logger.info(
-        "BigQuery load job completed successfully."
-    )
+    logger.info("BigQuery load job completed successfully.")
 
     # 7. Verify loaded table
 
-    table = client.get_table(
-        bq_table
-    )
+    table = client.get_table(bq_table)
 
     rows_in_bq = table.num_rows
 
-    logger.info(
-        f"Rows currently in BigQuery: "
-        f"{rows_in_bq:,}"
-    )
+    logger.info(f"Rows currently in BigQuery: {rows_in_bq:,}")
 
     # 8. Validate row count
 
     if rows_in_bq != expected_row_count:
-
         error = (
-            f"Row count mismatch: "
-            f"expected {expected_row_count:,}, "
-            f"got {rows_in_bq:,}"
+            f"Row count mismatch: expected {expected_row_count:,}, got {rows_in_bq:,}"
         )
 
         logger.error(error)
@@ -218,25 +181,15 @@ def load(expected_row_count: int) -> dict:
             "error": error,
         }
 
-    logger.info(
-        f"Row count verification passed: "
-        f"{rows_in_bq:,} rows."
-    )
+    logger.info(f"Row count verification passed: {rows_in_bq:,} rows.")
 
     # 9. Remove local staging file
-    
 
-    CLEAN_STAGING_PATH.unlink(
-        missing_ok=True
-    )
+    CLEAN_STAGING_PATH.unlink(missing_ok=True)
 
-    logger.info(
-        f"Clean staging file removed: "
-        f"{CLEAN_STAGING_PATH}"
-    )
+    logger.info(f"Clean staging file removed: {CLEAN_STAGING_PATH}")
 
     # 10. Return successful result
-    
 
     return {
         "status": "success",

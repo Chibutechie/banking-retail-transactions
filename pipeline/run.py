@@ -5,10 +5,11 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Callable, NoReturn
+from typing import NoReturn
 
 if __package__ in (None, ""):
     project_root = Path(__file__).resolve().parent.parent
@@ -46,6 +47,7 @@ def _write_manifest(state: RunState, status: str, **extra) -> None:
         pipeline_status=status,
         started_at=state.started,
         source_repo=HF_REPO_ID,
+        source_revision=state.dl.get("revision"),
         checksum=state.dl.get("checksum"),
         source_row_count=state.dl.get("row_count"),
         valid_rows=state.vl.get("valid_rows"),
@@ -65,9 +67,7 @@ def _fail(state: RunState, stage: str, reason: str) -> NoReturn:
     """Write failure manifest and exit non-zero."""
     logger.error(f"Failed at {stage}: {reason}")
     try:
-        _write_manifest(
-            state, "failed", failure_stage=stage, failure_reason=reason
-        )
+        _write_manifest(state, "failed", failure_stage=stage, failure_reason=reason)
     except Exception:  # never let manifest errors mask the real failure
         logger.exception("Could not write failure manifest")
     raise typer.Exit(code=1)
@@ -156,8 +156,11 @@ def _run_dbt() -> dict:
             detail += f"; {result.stderr.strip()[-500:]}"
         return _dbt_failed(
             detail,
-            **({k: counts[k] for k in ("models", "tests_passed", "tests_failed")}
-               if counts else {}),
+            **(
+                {k: counts[k] for k in ("models", "tests_passed", "tests_failed")}
+                if counts
+                else {}
+            ),
         )
 
     counts = counts or {"models": 0, "tests_passed": 0, "tests_failed": 0}
@@ -182,7 +185,7 @@ def main(
     skip_dbt: bool = typer.Option(False, "--skip-dbt"),
 ) -> None:
     """Run the full pipeline: download -> validate -> load -> dbt."""
-    state = RunState(started=datetime.now(timezone.utc))
+    state = RunState(started=datetime.now(UTC))
 
     logger.info("=" * 60)
     logger.info("Pipeline started")
@@ -191,7 +194,7 @@ def main(
     ensure_dirs()
     try:
         validate_env()
-    except EnvironmentError as exc:
+    except OSError as exc:
         _fail(state, "startup", str(exc))
 
     # Stage 1: download

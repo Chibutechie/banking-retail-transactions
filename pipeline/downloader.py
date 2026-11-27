@@ -5,9 +5,8 @@ import time
 import pyarrow.parquet as pq
 from datasets import load_dataset
 
-from pipeline.config import BRONZE_PATH, HF_REPO_ID
+from pipeline.config import BRONZE_PATH, HF_DATASET_REVISION, HF_REPO_ID
 from pipeline.logger import logger
-
 
 _MAX_RETRIES = 3
 _RETRY_DELAY_SECS = 5
@@ -16,14 +15,17 @@ _RETRY_DELAY_SECS = 5
 def download() -> dict:
     """Download the dataset and save it to the Bronze layer."""
 
-    logger.info(f"Downloading dataset: {HF_REPO_ID}")
+    logger.info(f"Downloading dataset: {HF_REPO_ID} at revision {HF_DATASET_REVISION}")
 
     dataset = None
     last_err = None
 
     for attempt in range(1, _MAX_RETRIES + 1):
         try:
-            dataset = load_dataset(HF_REPO_ID)
+            dataset = load_dataset(
+                HF_REPO_ID,
+                revision=HF_DATASET_REVISION,
+            )
             break
 
         except Exception as error:
@@ -37,9 +39,7 @@ def download() -> dict:
                 time.sleep(_RETRY_DELAY_SECS)
 
     if dataset is None:
-        raise RuntimeError(
-            f"Download failed after {_MAX_RETRIES} attempts: {last_err}"
-        )
+        raise RuntimeError(f"Download failed after {_MAX_RETRIES} attempts: {last_err}")
 
     # Use the train split when available.
     if "train" in dataset:
@@ -66,13 +66,11 @@ def download() -> dict:
 
     row_count = len(table)
 
-    logger.info(
-        f"Bronze saved: {row_count:,} rows | "
-        f"{file_size_mb} MB"
-    )
+    logger.info(f"Bronze saved: {row_count:,} rows | {file_size_mb} MB")
 
     return {
         "bronze_path": str(BRONZE_PATH),
+        "revision": HF_DATASET_REVISION,
         "row_count": row_count,
         "file_size_mb": file_size_mb,
     }

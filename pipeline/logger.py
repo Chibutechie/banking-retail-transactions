@@ -6,7 +6,6 @@ from loguru import logger
 
 from pipeline.config import LOG_DIR
 
-
 # ── Logging Directory ─────────────────────────────────────────────────────────
 
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -37,12 +36,7 @@ logger.add(
 logger.add(
     str(LOG_DIR / "pipeline_{time:YYYY-MM-DD}.log"),
     level="DEBUG",
-    format=(
-        "{time:YYYY-MM-DD HH:mm:ss} | "
-        "{level: <8} | "
-        "{name}:{line} | "
-        "{message}"
-    ),
+    format=("{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{line} | {message}"),
     rotation="00:00",
     retention="7 days",
     compression="zip",

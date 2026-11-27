@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
 credentials/
 docs/stack-checklist.md
 logs/
@@ -10,7 +13,7 @@ logs/
 dbt/target/
 dbt/target*/
 dbt/logs/
-dbt/packages 
+dbt/packages
 
 # Local MinIO persistence; preserve the directory placeholder only.
 /local-data/*
@@ -18,8 +21,6 @@ dbt/packages
 !/local-data/minio/
 /local-data/minio/*
 !/local-data/minio/.gitkeep
-scratchpad
-
 # Runtime
 data/
 *.log

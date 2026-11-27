@@ -44,6 +44,10 @@ def ensure_dirs() -> None:
 # ── Source & Warehouse Config ─────────────────────────────────────────────────
 
 HF_REPO_ID = "electricsheepafrica/nigerian-banking-retail-transactions"
+HF_DATASET_REVISION = os.getenv(
+    "HF_DATASET_REVISION",
+    "c31e7981f3a935fc9142923fd082143a4204b4f9",
+)
 
 GCP_PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 BQ_DATASET_RAW = os.getenv("BQ_DATASET_RAW", "raw")
@@ -91,12 +95,10 @@ def validate_env() -> None:
     """Fail fast if the environment or project layout is misconfigured."""
     missing = [name for name in REQUIRED_ENV if not os.getenv(name)]
     if missing:
-        raise EnvironmentError(
-            f"Missing: {', '.join(missing)}. Set in .env or environment."
-        )
+        raise OSError(f"Missing: {', '.join(missing)}. Set in .env or environment.")
 
     if not (DBT_DIR / "dbt_project.yml").is_file():
-        raise EnvironmentError(f"dbt project not found at {DBT_DIR}")
+        raise OSError(f"dbt project not found at {DBT_DIR}")
 
 
 if __name__ == "__main__":

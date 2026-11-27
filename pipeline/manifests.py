@@ -1,7 +1,7 @@
 """Writes JSON run manifest — audit trail for every pipeline run."""
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from pipeline.config import MANIFESTS_DIR
@@ -14,6 +14,7 @@ def write(
     pipeline_status: str,
     started_at: datetime,
     source_repo: str,
+    source_revision: str | None = None,
     checksum: str | None = None,
     source_row_count: int | None = None,
     valid_rows: int | None = None,
@@ -32,9 +33,9 @@ def write(
 
     # Guard against naive datetimes so the duration maths can't raise.
     if started_at.tzinfo is None:
-        started_at = started_at.replace(tzinfo=timezone.utc)
+        started_at = started_at.replace(tzinfo=UTC)
 
-    completed_at = datetime.now(timezone.utc)
+    completed_at = datetime.now(UTC)
     duration_s = round((completed_at - started_at).total_seconds(), 2)
 
     reconciled = _reconcile(
@@ -52,6 +53,7 @@ def write(
         "duration_seconds": duration_s,
         "source": {
             "repo": source_repo,
+            "revision": source_revision,
             "checksum": checksum,
             "rows": source_row_count,
         },
