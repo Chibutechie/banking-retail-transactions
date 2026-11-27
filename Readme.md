@@ -7,6 +7,7 @@ A batch data pipeline and analytics model for historical Nigerian retail banking
 ---
 
 - [Overview](#overview)
+- [The Business Problem](#the-business-problem)
 - [Project Objective](#project-objective)
 - [Pipeline Overview](#pipeline-overview)
 - [Project Structure](#project-structure)
@@ -32,15 +33,15 @@ Key outcomes from the most recent full run:
 | Metric                      | Value                          |
 | --------------------------- | ------------------------------ |
 | Source rows                 | 5,000,000                      |
-| Rejected rows (dead-letter) | 578,704 (~11.6%)               |
+| Rejected rows (dead-letter) | 0                              |
 | Warehouse                   | `raw.transactions` in BigQuery |
 
 [![Python](https://img.shields.io/badge/python-3.13-blue)](https://www.python.org/)
 [![dbt](https://img.shields.io/badge/dbt-1.11-orange)](https://www.getdbt.com/)
-[![duckdb](https://img.shields.io/badge/snowflake-latest-blue)](https://www.snowflake.com/)
+[![DuckDB](https://img.shields.io/badge/DuckDB-local%20validation-yellow)](https://duckdb.org/)
+[![BigQuery](https://img.shields.io/badge/BigQuery-cloud%20warehouse-4285F4)](https://cloud.google.com/bigquery)
 [![Power BI](https://img.shields.io/badge/power%20bi-ready-yellow)](https://powerbi.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-a
 
 ---
 
@@ -73,22 +74,25 @@ flowchart LR
 
 ## What the data shows
 
-The local validation run processed 5,000,000 rows: 4,421,296 accepted and 578,704 rejected (11.6%). These are recorded project results, not a promise that every source revision will produce the same counts.
+The source is a 5,000,000-row transaction dataset. Each row represents one synthetic retail-banking transaction and contains 16 source columns.
 
-| Rejection reason | Rows flagged |
-| ---------------- | -----------: |
-| Invalid state    |      542,759 |
-| Invalid status   |       40,383 |
-| Both reasons     |        4,438 |
+| Dataset area | Columns | Description |
+| --- | --- | --- |
+| Identifiers | `transaction_id`, `account_id`, `customer_id` | Transaction, account, and customer keys |
+| Transaction | `timestamp`, `amount_ngn`, `transaction_type`, `status` | When the transaction occurred, its amount, type, and outcome |
+| Balances | `balance_before_ngn`, `balance_after_ngn` | Account balances before and after the transaction |
+| Merchant | `merchant_category_code`, `merchant_name` | Merchant classification and name |
+| Geography | `location_lga`, `location_state` | Local government area and state/FCT |
+| Access and risk | `channel`, `device_id`, `fraud_flag` | Transaction channel, device, and fraud indicator |
 
-Reason counts overlap. The state rule currently rejects the value `Abuja (FCT)` because the allowlist contains `fct`; the status rule rejects `pending`, while the configured allowed statuses are `success`, `failed`, and `reversed`. No rows in this run were rejected for negative balances. See [validation results and source fields](docs/data_dictionary.md).
+The latest local validation accepted all 5,000,000 rows, with no rejected records. For loader types, nullability, accepted categorical values, and validation rules, see the [data dictionary](docs/data_dictionary.md).
 
 ## Architecture
 
 ```mermaid
 flowchart LR
     HF[Hugging Face dataset] --> Bronze[Bronze Parquet]
-    Bronze --> DuckDB[DuckDB validation]
+    Bronze --> DuckDB[DuckDB validation]b
     DuckDB --> Clean[Clean staging Parquet]
     DuckDB --> Rejects[Dead-letter Parquet and CSV]
     Clean --> Raw[BigQuery raw.transactions]
@@ -148,7 +152,7 @@ The dbt schema-name macro uses configured model schemas without adding the profi
 ## Project status and limitations
 
 - The dataset is described by its publisher as synthetic and contains no bank identifier. It cannot support Tier 1/Tier 2 comparisons or cross-bank fraud tracking.
-- The recorded rejection rate is high. Most rejected rows use `Abuja (FCT)`, which does not match the current state allowlist; `pending` is also excluded by the current status allowlist. Review these rules before interpreting the accepted subset as representative.
+- No rows were rejected in the recorded local validation run. Review validation counts in the run manifest when the source data or validation rules change.
 - The Parquet timestamp column has no timezone metadata. Its stored values span 2023-01-01 to 2024-12-30; the data does not establish whether they represent UTC or WAT. The pipeline currently applies no timezone shift.
 - `snapshot_customers` references `customer_name`, which is absent from the raw loader schema and staging model. The snapshot needs correction before it can be relied on.
 - A prior test run had 59 tests: 57 passed, the date-dimension test was subsequently fixed, and `assert_balance_consistency` returned 317,697 rows. The current project declares 90 tests; that full suite has not been rerun as a whole.
