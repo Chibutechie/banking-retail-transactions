@@ -74,33 +74,20 @@ flowchart LR
 
 The source is a 5,000,000-row transaction dataset. Each row represents one synthetic retail-banking transaction and contains 16 source columns.
 
-| Dataset area | Columns | Description |
-| --- | --- | --- |
-| Identifiers | `transaction_id`, `account_id`, `customer_id` | Transaction, account, and customer keys |
-| Transaction | `timestamp`, `amount_ngn`, `transaction_type`, `status` | When the transaction occurred, its amount, type, and outcome |
-| Balances | `balance_before_ngn`, `balance_after_ngn` | Account balances before and after the transaction |
-| Merchant | `merchant_category_code`, `merchant_name` | Merchant classification and name |
-| Geography | `location_lga`, `location_state` | Local government area and state/FCT |
-| Access and risk | `channel`, `device_id`, `fraud_flag` | Transaction channel, device, and fraud indicator |
+| Dataset area    | Columns                                                 | Description                                                  |
+| --------------- | ------------------------------------------------------- | ------------------------------------------------------------ |
+| Identifiers     | `transaction_id`, `account_id`, `customer_id`           | Transaction, account, and customer keys                      |
+| Transaction     | `timestamp`, `amount_ngn`, `transaction_type`, `status` | When the transaction occurred, its amount, type, and outcome |
+| Balances        | `balance_before_ngn`, `balance_after_ngn`               | Account balances before and after the transaction            |
+| Merchant        | `merchant_category_code`, `merchant_name`               | Merchant classification and name                             |
+| Geography       | `location_lga`, `location_state`                        | Local government area and state/FCT                          |
+| Access and risk | `channel`, `device_id`, `fraud_flag`                    | Transaction channel, device, and fraud indicator             |
 
 The latest local validation accepted all 5,000,000 rows, with no rejected records. The table above summarizes the source structure used by the loader.
 
 ## Architecture
 
-![Nigerian Retail Banking Intelligence Platform architecture](docs/images/architecture.png)
-
-([SVG source](docs/images/architecture.svg))
-
-```mermaid
-flowchart LR
-    HF[Hugging Face dataset] --> Bronze[Bronze Parquet]
-    Bronze --> DuckDB[DuckDB validation]
-    DuckDB --> Clean[Clean staging Parquet]
-    DuckDB --> Rejects[Dead-letter Parquet and CSV]
-    Clean --> Raw[BigQuery raw.transactions]
-    Raw --> DBT[dbt models and tests]
-    DBT --> Marts[BigQuery marts]
-```
+![Nigerian Retail Banking Intelligence Platform architecture](docs/images/architecture.svg)
 
 The Python CLI runs download, validation, BigQuery load, and `dbt build` in sequence. It writes a JSON manifest for success or failure. For implementation details, see [architecture](docs/architecture.md) and [dbt models](docs/dbt_models.md).
 
