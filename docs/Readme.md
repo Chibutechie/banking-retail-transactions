@@ -17,6 +17,10 @@ This document explains the architecture of the Nigerian Retail Banking Intellige
 
 ## 1. System overview
 
+![Nigerian Retail Banking Intelligence Platform architecture](images/architecture.png)
+
+([SVG source](images/architecture.svg))
+
 ```mermaid
 flowchart LR
     HF[Hugging Face dataset] --> Bronze[Bronze Parquet<br/>immutable snapshot]
