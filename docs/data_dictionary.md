@@ -29,20 +29,18 @@ The downloaded Bronze Parquet file contains 5,000,000 rows. The `timestamp` fiel
 
 ## Validation rules
 
-`pipeline/validator.py` requires all 16 columns above. It rejects rows with empty transaction/account/customer IDs; non-positive or non-numeric amounts; negative or non-numeric balances; null/out-of-range timestamps; states outside the normalized 36-state-plus-FCT allowlist; channels outside `mobile`, `pos`, `atm`, `web`, `ussd`, `agent`, and `branch`; statuses outside `success`, `failed`, and `reversed`; null fraud flags; and duplicate transaction IDs among otherwise valid rows.
+`pipeline/validator.py` requires all 16 columns above. It rejects rows with empty transaction/account/customer IDs; non-positive or non-numeric amounts; negative or non-numeric balances; null/out-of-range timestamps; states outside the normalized 36-state-plus-FCT allowlist; channels outside `mobile`, `pos`, `atm`, `web`, `ussd`, `agent`, and `branch`; statuses outside `success`, `failed`, `reversed`, and `pending`; null fraud flags; and duplicate transaction IDs among otherwise valid rows.
 
-The validator lowercases and trims categorical values before checking. It does not currently normalize `Abuja (FCT)` to `fct` or accept `pending` as a valid status. It does not reject blank merchant category codes.
+The validator lowercases and trims categorical values before checking. It normalizes `Abuja (FCT)` and equivalent variants to `fct`, and accepts `pending` as a valid status. It does not reject blank merchant category codes.
 
 ## Recorded validation result
 
-A local run on 5,000,000 source rows accepted 4,421,296 and rejected 578,704. Counts below are reason occurrences, not mutually exclusive row totals.
+A local run on 5,000,000 source rows accepted all 5,000,000 and rejected 0.
 
 | Rejection reason                          | Rows flagged |
 | ----------------------------------------- | -----------: |
-| `invalid_state`                           |      542,759 |
-| `invalid_status`                          |       40,383 |
-| Both `invalid_state` and `invalid_status` |        4,438 |
+| No rejection reasons | 0 |
 
-Every row flagged `invalid_state` in this run had `location_state = 'Abuja (FCT)'`. Every row flagged `invalid_status` had `status = 'pending'`. The overlap is 4,438 rows, so the distinct rejected-row total is 542,759 + 40,383 - 4,438 = 578,704. No rows in this run were rejected for balance rules.
+No rows in this run were rejected for state, status, balance, or any other validation rule.
 
-The clean Parquet file is written to `data/staging/clean_transactions.parquet`; rejected rows, including `error_reasons`, are written to `data/dead-letter/rejected.parquet` and `rejected.csv`. Successful BigQuery loads truncate and replace the configured raw table, verify the loaded row count, and then delete the local clean file.
+The clean Parquet file is written to `data/staging/clean_transactions.parquet`. If a future run rejects rows, they will include `error_reasons` and be written to `data/dead-letter/rejected.parquet` and `rejected.csv`. Successful BigQuery loads truncate and replace the configured raw table, verify the loaded row count, and then delete the local clean file.
