@@ -1,6 +1,6 @@
 # Architecture Decisions
 
-This document explains the architecture of the Nigerian Retail Banking Intelligence Platform and the reasoning behind each major decision. The high-level diagram is in the [README](../README.md#architecture). This document covers the _why_.
+This document explains the architecture of the Nigerian Retail Banking Intelligence Platform and the reasoning behind each major decision. The high-level diagram is in the [README](../Readme.md#architecture). This document covers the _why_.
 
 ## Contents
 
@@ -17,7 +17,9 @@ This document explains the architecture of the Nigerian Retail Banking Intellige
 
 ## 1. System overview
 
-![Nigerian Retail Banking Intelligence Platform architecture](images/architecture.svg)
+![Nigerian Retail Banking Intelligence Platform architecture](images/architecture.png)
+
+([SVG source](images/architecture.svg))
 
 The platform is a batch pipeline that turns one historical transaction snapshot into validated, documented analytical datasets in BigQuery. It runs on demand through a single command. The design follows one principle: **validate locally and cheaply, then transform and serve in the cloud.**
 
@@ -38,7 +40,6 @@ The platform is a batch pipeline that turns one historical transaction snapshot 
 | D9  | Use a Python CLI with a Make target as the entry point         | Accepted |
 | D10 | Write a run manifest for every run, success or failure         | Accepted |
 | D11 | Make runs idempotent for the same source version               | Accepted |
-| D12 | Keep the platform out of scope for dashboards in this document | Accepted |
 
 ---
 
@@ -108,7 +109,7 @@ The platform is a batch pipeline that turns one historical transaction snapshot 
 **Why:**
 
 - **Managed and serverless:** No cluster to size, patch, or maintain.
-- **Native Looker Studio connection:** Downstream analytics connect directly without an extra export step.
+- **Native BigQuery access:** Downstream consumers query the warehouse directly without an extra export step.
 - **Free tier fits the workload:** At this data volume, storage and query costs remain within the free tier.
 - **Standard SQL and dbt support:** The dbt BigQuery adapter is mature and widely used.
 
@@ -147,7 +148,7 @@ The platform is a batch pipeline that turns one historical transaction snapshot 
 - **Separation of concerns:** Cleaning, business logic, and presentation are kept apart, so a change in one does not force changes in the others.
 - **Easier debugging:** A wrong number in a mart can be traced back layer by layer.
 - **Reuse:** Intermediate models can feed several marts without repeating logic.
-- **Stable interface for consumers:** Marts are the only layer analysts query. Internal logic can change without breaking dashboards.
+- **Stable interface for consumers:** Marts are the only layer analysts query. Internal logic can change without breaking downstream consumers.
 
 **Consequence:** More models to maintain. For a project this size, the cost is small and the clarity is worth it.
 
@@ -208,19 +209,6 @@ The platform is a batch pipeline that turns one historical transaction snapshot 
 
 ---
 
-### D12. Scope: dashboards are outside this architecture
-
-**Decision:** The architecture ends at the BigQuery marts. Dashboard design and Looker Studio configuration are documented separately.
-
-**Why:**
-
-- The architecture's job is to produce trusted datasets. Dashboards are a consumer of those datasets.
-- Keeping the boundary clear means dashboard changes do not require architecture changes.
-
-**Consequence:** Anyone reading only this document will not see how the data is used. The README links to the dashboard documentation for that.
-
----
-
 ## 4. Data flow and layers
 
 1. **Download:** The Python CLI fetches the pinned version of the dataset from Hugging Face and records its checksum.
@@ -262,7 +250,6 @@ The platform is a batch pipeline that turns one historical transaction snapshot 
 | Spark or Dataproc               | A distributed engine is unnecessary at 5 million rows and adds cluster management.                                  |
 | Transformations in Python       | Harder to test, version, and document than dbt models.                                                              |
 | Loading CSV instead of Parquet  | Loses types and is larger and slower to load.                                                                       |
-| Snowflake or Power BI           | Not part of the chosen stack. The project uses BigQuery and Looker Studio.                                          |
 
 ---
 

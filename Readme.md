@@ -83,7 +83,7 @@ The source is a 5,000,000-row transaction dataset. Each row represents one synth
 | Geography | `location_lga`, `location_state` | Local government area and state/FCT |
 | Access and risk | `channel`, `device_id`, `fraud_flag` | Transaction channel, device, and fraud indicator |
 
-The latest local validation accepted all 5,000,000 rows, with no rejected records. For loader types, nullability, accepted categorical values, and validation rules, see the [data dictionary](docs/data_dictionary.md).
+The latest local validation accepted all 5,000,000 rows, with no rejected records. The table above summarizes the source structure used by the loader.
 
 ## Architecture
 
@@ -94,7 +94,7 @@ The latest local validation accepted all 5,000,000 rows, with no rejected record
 ```mermaid
 flowchart LR
     HF[Hugging Face dataset] --> Bronze[Bronze Parquet]
-    Bronze --> DuckDB[DuckDB validation]b
+    Bronze --> DuckDB[DuckDB validation]
     DuckDB --> Clean[Clean staging Parquet]
     DuckDB --> Rejects[Dead-letter Parquet and CSV]
     Clean --> Raw[BigQuery raw.transactions]
@@ -163,7 +163,7 @@ The dbt schema-name macro uses configured model schemas without adding the profi
 - `dbt/tests/`: singular SQL data tests.
 - `dbt/analyses/`: ad hoc SQL analyses.
 - `dbt/snapshots/`: customer snapshot configuration.
-- `docs/`: architecture, model reference, and source/validation details.
+- `docs/`: architecture and dbt model reference.
 - `data/`, `credentials/`, `.env`: local data and credentials; keep these out of version control.
 
 ## References
@@ -171,13 +171,3 @@ The dbt schema-name macro uses configured model schemas without adding the profi
 - [Source dataset](https://huggingface.co/datasets/electricsheepafrica/nigerian-banking-retail-transactions)
 - [Architecture](docs/architecture.md)
 - [dbt model reference](docs/dbt_models.md)
-- [Data dictionary and validation results](docs/data_dictionary.md)
-  ocs/architecture.md)
-- [dbt model reference](docs/dbt_models.md)
-- [Data dictionary and validation results](docs/data_dictionary.md)
-  ocs/architecture.md)
-- [dbt model reference](docs/dbt_models.md)
-- [Data dictionary and validation results](docs/data_dictionary.md)
-  ocs/architecture.md)
-- [dbt model reference](docs/dbt_models.md)
-- [Data dictionary and validation results](docs/data_dictionary.md)
