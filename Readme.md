@@ -8,14 +8,17 @@ A batch data pipeline and analytics model for historical Nigerian retail banking
 
 - [Overview](#overview)
 - [The Business Problem](#the-business-problem)
-- [Project Objective](#project-objective)
 - [Pipeline Overview](#pipeline-overview)
-- [Project Structure](#project-structure)
-- [Architecture Flow](#architecture-flow)
-- [How It Works](#how-it-works)
+- [What the data shows](#what-the-data-shows)
 - [Source Dataset](#source-dataset)
+- [Architecture Flow](#architecture-flow)
+- [Project Structure](#project-structure)
 - [Technologies](#technologies)
 - [Setup Instructions](#setup-instructions)
+- [How It Works](#how-it-works)
+- [Project status and limitations](#project-status-and-limitations)
+- [Repository map](#repository-map)
+- [References](#references)
 
 ---
 
@@ -70,6 +73,17 @@ flowchart LR
     Problem -.-> Solution
 ```
 
+## Pipeline Overview
+
+The pipeline runs as a single, auditable batch workflow:
+
+1. **Download:** Fetch the pinned Hugging Face dataset revision and write an immutable Bronze Parquet snapshot.
+2. **Validate:** Use DuckDB to check the schema, business rules, and duplicate transaction IDs.
+3. **Split:** Write valid records to clean staging Parquet. Any future rejected records are written to the dead-letter outputs with error reasons.
+4. **Load:** Replace `raw.transactions` in BigQuery and verify the loaded row count.
+5. **Transform and test:** Run dbt staging, intermediate, mart, snapshot, and test resources.
+6. **Record:** Write a JSON manifest containing source, validation, load, dbt, and reconciliation results.
+
 ## What the data shows
 
 The source is a 5,000,000-row transaction dataset. Each row represents one synthetic retail-banking transaction and contains 16 source columns.
@@ -85,13 +99,131 @@ The source is a 5,000,000-row transaction dataset. Each row represents one synth
 
 The latest local validation accepted all 5,000,000 rows, with no rejected records. The table above summarizes the source structure used by the loader.
 
-## Architecture
+## Source Dataset
+
+The source is the synthetic [`electricsheepafrica/nigerian-banking-retail-transactions`](https://huggingface.co/datasets/electricsheepafrica/nigerian-banking-retail-transactions) dataset on Hugging Face. It contains one `train` split with 5,000,000 retail-banking transactions and 16 source columns.
+
+The downloader uses `HF_DATASET_REVISION` from `.env` and defaults to a pinned dataset revision. The downloaded data is stored locally as Snappy-compressed Parquet under `data/bronze/`, which is intentionally excluded from version control.
+
+## Architecture Flow
 
 ![Nigerian Retail Banking Intelligence Platform architecture](docs/images/architecture.svg)
 
 The Python CLI runs download, validation, BigQuery load, and `dbt build` in sequence. It writes a JSON manifest for success or failure. For implementation details, see [architecture](docs/architecture.md) and [dbt models](docs/dbt_models.md).
 
-## Quickstart
+## Project Structure
+
+```text
+.
+├── .github/
+│   └── workflows/
+│       └── ci.yml                         Automated lint, format, and test checks
+├── .vscode/
+│   ├── extensions.json                     Recommended Python and Ruff extensions
+│   ├── launch.json                         Python pipeline debug configuration
+│   ├── settings.json                       Python and pytest editor settings
+│   └── tasks.json                          Test, lint, and pipeline tasks
+├── dbt/
+│   ├── analyses/
+│   │   ├── analyze_customer_segment_value.sql
+│   │   ├── analyze_daily_volume_trend.sql
+│   │   └── analyze_fraud_by_channel.sql
+│   ├── macros/
+│   │   ├── generate_schema_name.sql        Routes models to BigQuery datasets
+│   │   └── test_state_in_seed.sql          Seed-backed validation macro
+│   ├── models/
+│   │   ├── staging/
+│   │   │   ├── properties.yml
+│   │   │   ├── sources.yml
+│   │   │   └── stg_transactions.sql        Clean source view
+│   │   ├── intermediate/
+│   │   │   ├── int_customer_metrics.sql
+│   │   │   ├── int_transactions_enriched.sql
+│   │   │   └── properties.yml
+│   │   └── marts/
+│   │       ├── dim_channel.sql
+│   │       ├── dim_customer.sql
+│   │       ├── dim_date.sql
+│   │       ├── dim_geography.sql
+│   │       ├── dim_merchants.sql
+│   │       ├── dimensions.yml
+│   │       ├── fct_channel_summary.sql
+│   │       ├── fct_daily_summary.sql
+│   │       ├── fct_fraud_summary.sql
+│   │       ├── fct_geographic_summary.sql
+│   │       ├── fct_merchant_summary.sql
+│   │       ├── fct_transactions.sql
+│   │       ├── fct_transactions_keys.sql
+│   │       ├── mart_executive_kpis.sql
+│   │       └── properties.yml
+│   ├── seeds/
+│   │   └── state_zones.csv                  State reference data
+│   ├── snapshots/
+│   │   └── snapshot_customers.sql           Customer-state history
+│   ├── tests/
+│   │   ├── assert_amounts_positive.sql
+│   │   ├── assert_balance_consistency.sql
+│   │   ├── assert_channel_summary_valid.sql
+│   │   ├── assert_customer_status_totals.sql
+│   │   ├── assert_date_dimension_complete.sql
+│   │   ├── assert_executive_kpis_valid.sql
+│   │   ├── assert_fact_keys_not_null.sql
+│   │   ├── assert_fraud_summary_valid.sql
+│   │   ├── assert_geographic_coverage.sql
+│   │   ├── assert_geographic_summary_valid.sql
+│   │   └── assert_no_future_or_past_dates.sql
+│   ├── .gitignore
+│   ├── .sqlfluff
+│   ├── .sqlfluffgitignore
+│   ├── .user.yml
+│   ├── dbt_project.yml
+│   ├── profiles.yml
+│   └── README.md
+├── docs/
+│   ├── images/
+│   │   ├── architecture.png
+│   │   ├── architecture.svg
+│   │   └── dbt-dag.png
+│   ├── architecture.md                      Architecture decisions and data flow
+│   └── dbt_models.md                        dbt model reference and test notes
+├── pipeline/
+│   ├── __init__.py
+│   ├── config.py                            Paths, environment, and validation rules
+│   ├── downloader.py                        Hugging Face download and Bronze snapshot
+│   ├── loader.py                            BigQuery loader and row-count verification
+│   ├── logger.py                            Console and rotating file logging
+│   ├── manifests.py                         JSON run manifests and reconciliation
+│   ├── run.py                               CLI orchestration
+│   └── validator.py                         DuckDB schema, rule, and duplicate checks
+├── tests/
+│   ├── test_config.py
+│   ├── test_downloader.py
+│   ├── test_loader.py
+│   ├── test_manifests.py
+│   └── test_validator.py
+├── .env.example                             Required local configuration template
+├── .gitignore                               Tracked and generated-file exclusions
+├── LICENSE                                  MIT license for this project’s code
+├── Makefile                                 Common install, test, lint, and run commands
+├── Readme.md                                Project overview and operating guide
+├── pyproject.toml                           Package and tool configuration
+└── requirements.txt                         Compatibility install entry point
+```
+
+Runtime data is kept outside version control in `data/`: Bronze input, clean staging, dead-letter outputs, logs, and run manifests. Local credentials and configuration live in `credentials/` and `.env`; both are intentionally ignored by Git.
+
+## Technologies
+
+| Area                       | Tools                                   |
+| -------------------------- | --------------------------------------- |
+| Language and CLI           | Python 3.11+, Typer                     |
+| Source and storage formats | Hugging Face Datasets, PyArrow, Parquet |
+| Local validation           | DuckDB                                  |
+| Warehouse                  | Google BigQuery                         |
+| Transformation             | dbt Core with the BigQuery adapter      |
+| Quality and automation     | Pytest, Ruff, GitHub Actions            |
+
+## Setup Instructions
 
 Requirements: Python 3.11 or later, Google Cloud access to BigQuery, and Application Default Credentials. The dbt profile uses OAuth.
 
@@ -102,11 +234,13 @@ python -m pip install -e ".[dev]"
 Copy-Item .env.example .env
 ```
 
-Set `GCP_PROJECT_ID` in `.env`, then authenticate:
+Set `GCP_PROJECT_ID` in `.env`, confirm the pinned `HF_DATASET_REVISION`, then authenticate:
 
 ```powershell
 gcloud auth application-default login
 ```
+
+## How It Works
 
 Run the complete pipeline:
 
